@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="./assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <title>Document</title>
+</head>
+<body>
+    <a href="./api/config/db_config.php"></a>
+    <img src="../img/users/" alt="">
+    
+    class User{
+        // database connection and table name
+        private $conn;
+        private $table_name = "users";
+        // object properties
+        public $UID;
+        public $email;
+        public $name;
+        public $phone;
+        public $address;
+        public $photo;
+        public $password;
+        public $created;
+        // constructor with $db as database connection
+        public function __construct($db){
+            $this->conn = $db;
+        }
+
+        //  Getuser
+        function view_profile(){
+            // query to select record
+            $query ="SELECT
+                        `UID`, `email`, `name`, `phone`, `address`, `photo`, `password`, `created`
+                    FROM
+                        " . $this->table_name . " 
+                    WHERE
+                        email='".$this->email."' AND password='".$this->password."'
+                    LIMIT 0,1";
+                // Prepare statement
+            $stmt = $this->conn->prepare($query);
+            // Bind ID
+            $stmt->bindParam(1, $this->UID);
+            // Execute query
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            // Set properties
+            $this->email = $row['email'];
+            $this->name = $row['name'];
+            $this->phone = $row['phone'];
+            $this->address = $row['address'];
+            $this->photo = $row['photo'];
+            $this->password = $row['password'];
+            $this->created = $row['created'];
+        }
+
+        // Update user's Details
+        function update_profile(){
+            // Create query
+          $query = 'UPDATE ' . $this->table . '
+          SET name =  email = :email, name = :name, phone = :phone, address = :address, address = :address, photo = :photo, password = :password 
+          WHERE UID = :UID';
+            // Prepare statement
+            $stmt = $this->conn->prepare($query);
+            // Clean data
+            $this->email = htmlspecialchars(strip_tags($this->email));
+            $this->name = htmlspecialchars(strip_tags($this->name));
+            $this->phone = htmlspecialchars(strip_tags($this->phone));
+            $this->address = htmlspecialchars(strip_tags($this->address));
+            $this->photo = htmlspecialchars(strip_tags($this->photo));
+            $this->password = htmlspecialchars(strip_tags($this->password));
+            $this->UID = htmlspecialchars(strip_tags($this->UID));
+            // Bind data
+            $stmt->bindParam(':email', $this->email);
+            $stmt->bindParam(':name', $this->name);
+            $stmt->bindParam(':phone', $this-phone);
+            $stmt->bindParam(':address', $this->address);
+            $stmt->bindParam(':photo', $this->photo);
+            $stmt->bindParam(':password', $this->password);
+            $stmt->bindParam(':UID', $this->UID);
+            // Execute query
+            if($stmt->execute()) {
+            return true;
+            }
+            // Print error if something goes wrong
+            printf("Error: %s.\n", $stmt->error);
+            return false;
+        }
+
+        // Delete user's Details
+        function delete_profile(){
+            // Create query
+          $query = 'DELETE FROM ' . $this->table . ' WHERE UID = :UID';
+          // Prepare statement
+          $stmt = $this->conn->prepare($query);
+          // Clean data
+          $this->UID = htmlspecialchars(strip_tags($this->UID));
+          // Bind data
+          $stmt->bindParam(':UID', $this->UID);
+          // Execute query
+          if($stmt->execute()) {
+            return true;
+          }
+          // Print error if something goes wrong
+          printf("Error: %s.\n", $stmt->error);
+
+          return false; 
+        }
+    }
+</body>
+</html>
