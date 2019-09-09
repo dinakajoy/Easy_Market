@@ -3,9 +3,9 @@
   // include database files
   require_once 'config/db_config.php';
   require_once 'config/db_conn.php';
-  require_once 'models/Users.php';
+  require_once 'models/User.php';
   // Instantiate Customer and Prepare insert query
-  $user = new Users();
+  @$user = new Users();
 
   $uData = [
     'email' => $_SESSION['email']

@@ -14,7 +14,6 @@ a{color:inherit;text-decoration:none}
   max-width:525px;
   min-height: 900px;
   position:relative;
-  background:url(../../../img/ecommerce.png) no-repeat center;
   box-shadow:0 12px 15px 0 rgba(0,0,0,.24),0 17px 50px 0 rgba(0,0,0,.19);
 }
 .wrap2 {
@@ -22,7 +21,6 @@ a{color:inherit;text-decoration:none}
   max-width:525px;
   min-height: 600px;
   position:relative;
-  background:url(../../../img/ecommerce.png) no-repeat center;
   box-shadow:0 12px 15px 0 rgba(0,0,0,.24),0 17px 50px 0 rgba(0,0,0,.19);
 }
 .cover {
@@ -116,5 +114,8 @@ a{color:inherit;text-decoration:none}
 }
 .foot-lnk{
   text-align:center;
+}
+button {
+  cursor: pointer;
 }
 /** SIGNUP/LOGIN FORM END **/

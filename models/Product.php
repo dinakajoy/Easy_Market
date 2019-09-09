@@ -6,17 +6,27 @@
             $this->db = new Database;
         }
 
+        public function getTwentyProducts() {
+          $this->db->query('SELECT p.PID, u.email as user_email, p.prod_name, p.prod_image, p.prod_desc, p.prod_price, p.created 
+                              FROM products p
+                            LEFT JOIN
+                              users u ON u.email = p.user_email
+                            ORDER BY
+                              p.created DESC
+                            LIMIT 
+                              20' );
+          $results = $this->db->resultset();
+          return $results;
+        }
+
         public function addProduct($data) {
-            // Prepare Query
-            $this->db->query('INSERT INTO products SET user_email = :user_email, prod_name = :prod_name, prod_image = :prod_image, prod_desc = :prod_desc, prod_price= :prod_price');
-            // Bind Values
+            $this->db->query('INSERT INTO products SET user_email = :user_email, prod_name = :prod_name, prod_image = :prod_image, prod_desc = :prod_desc, prod_price = :prod_price');
             $this->db->bind(':user_email', $data['user_email']);
             $this->db->bind(':prod_name', $data['prod_name']);
             $this->db->bind(':prod_image', $data['prod_image']);
             $this->db->bind(':prod_desc', $data['prod_desc']);
             $this->db->bind(':prod_price', $data['prod_price']);
 
-            // Execute
             if($this->db->execute()) {
                 return true;
             } else {
@@ -25,20 +35,43 @@
         }
 
         public function getProducts() {
-            // Prepare Query
             $this->db->query('SELECT p.PID, u.email as user_email, p.prod_name, p.prod_image, p.prod_desc, p.prod_price, p.created 
                                 FROM products p
                               LEFT JOIN
                                 users u ON u.email = p.user_email
                               ORDER BY
                                 p.created DESC' );
-            // Execute
             $results = $this->db->resultset();
             return $results;
         }
 
+        public function getProduct($data) {
+          $this->db->query('SELECT p.PID, u.email as user_email, u.UID, u.phone, p.prod_name, p.prod_image, p.prod_desc, p.prod_price, p.created 
+                            FROM products p
+                          LEFT JOIN
+                            users u ON u.email = p.user_email
+                          WHERE
+                            PID = :PID 
+                          LIMIT 0,1');
+          @$this->db->bind(':PID', $data['PID']);
+          $results = $this->db->single();
+          return $results;
+        }
+
+        public function relatedProducts() {
+          $this->db->query('SELECT p.PID, u.email as user_email, p.prod_name, p.prod_image, p.prod_desc, p.prod_price, p.created 
+                              FROM products p
+                            LEFT JOIN
+                              users u ON u.email = p.user_email
+                            ORDER BY
+                              p.created DESC
+                            LIMIT 
+                              5' );
+          $results = $this->db->resultset();
+          return $results;
+        }
+
         public function sellersProducts($data) {
-          // Prepare Query
           $this->db->query('SELECT PID, user_email, prod_name, prod_image, prod_desc, prod_price, created 
                               FROM products 
                             WHERE
@@ -46,72 +79,57 @@
                             ORDER BY
                               created DESC' );
           $this->db->bind(':email', $data['email']);
-          // Execute
           $results = $this->db->resultset();
           return $results;
         }
 
-        public function getProduct($data) {
-            // Prepare Query
-            $this->db->query('SELECT p.PID, u.email as user_email, p.prod_name, p.prod_image, p.prod_desc, p.prod_price, p.created 
-                              FROM products p
-                            LEFT JOIN
-                              users u ON u.email = p.user_email
-                            WHERE
-                              p.PID = :PID 
-                            LIMIT 0,1');
-            // Bind Values
-            $this->db->bind(':PID', $data['PID']);
-             // Execute
-            $results = $this->db->single();
-            return $results;
+        public function productLikes($data) {
+          $this->db->query('SELECT likes FROM products WHERE PID = :PID' );
+          $this->db->bind(':PID', $data);
+          $results = $this->db->single();
+          return $results;
         }
 
-        public function countProduct($data) {
-            // Prepare Query
-            $this->db->query('SELECT p.PID, u.email as user_email, p.prod_name, p.prod_image, p.prod_desc, p.prod_price, p.created 
-                              FROM products p
-                            LEFT JOIN
-                              users u ON u.email = p.user_email');
-            // Bind Values
-            $this->db->bind(':user_email', $data['user_email']);
-             // Execute
-            $results = $this->db->rowCount();
-            return $results;
+        public function updateLikes($data) {
+          $this->db->query('UPDATE products SET likes = likes + 1 WHERE PID = :PID');
+          $this->db->bind(':PID', $data);
+          $results = $this->db->execute();
+          return $results;
+        }
+
+        public function productDislikes($data) {
+          $this->db->query('SELECT dislikes FROM products WHERE PID = :PID' );
+          $this->db->bind(':PID', $data);
+          $results = $this->db->single();
+          return $results;
+        }
+
+        public function updateDislikes($data) {
+          $this->db->query('UPDATE products SET dislikes = likes + 1 WHERE PID = :PID');
+          $this->db->bind(':PID', $data);
+          $results = $this->db->execute();
+          return $results;
         }
 
         public function updateProduct($data) {
-            // Prepare Query
             $this->db->query('UPDATE products
                               SET user_email = :user_email, prod_name = :prod_name, prod_image = :prod_image, prod_desc = :prod_desc, prod_price = :prod_price
                             WHERE PID = :PID');
-            // Bind Values
-            $this->db->bind(':UID', $data['UID']);
-            $this->db->bind(':email', $data['email']);
-            $this->db->bind(':name', $data['name']);
-            $this->db->bind(':phone', $data['phone']);
-            $this->db->bind(':address', $data['address']);
-            $this->db->bind(':photo', $data['photo']);
-            $this->db->bind(':password', $data['password']);
-            // Execute
-            if($this->db->execute()) {
-                return true;
-            } else {
-                return false;
-            }
+             $this->db->bind(':PID', $data['PID']);
+             $this->db->bind(':user_email', $data['user_email']);
+             $this->db->bind(':prod_name', $data['prod_name']);
+             $this->db->bind(':prod_image', $data['prod_image']);
+             $this->db->bind(':prod_desc', $data['prod_desc']);
+             $this->db->bind(':prod_price', $data['prod_price']);
+             $results = $this->db->execute();
+             return $results;
         }
 
         public function deleteProduct($data) {
-            // Prepare Query
             $this->db->query('DELETE FROM products WHERE PID = :PID');
-            // Bind Values
-            $this->db->bind(':id', $data['id']);
-            // Execute
-            if($this->db->execute()) {
-                return true;
-            } else {
-                return false;
-            }
+            $this->db->bind(':PID', $data);
+            $results = $this->db->execute();
+            return $results;
         }
     }
 ?>

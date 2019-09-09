@@ -2,9 +2,9 @@
   // include database files
   require_once 'config/db_config.php';
   require_once 'config/db_conn.php';
-  require_once 'models/Users.php';
+  require_once 'models/User.php';
   // Instantiate Customer and Prepare insert query
-  $user = new Users();
+  @$user = new Users();
 
   // Initialize variables
   $error = $email = $password = '';
@@ -45,7 +45,6 @@
             session_start();
             $_SESSION['email'] = $email;
             $_SESSION['name'] = $res->name;
-            //$sql2 = 'UPDATE users SET status WHERE email = :email';
             header('location: home');
           } else {
             // Display wrong password message

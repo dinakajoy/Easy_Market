@@ -1,26 +1,28 @@
 <?php require_once 'inc/sessions.php'; ?>
 <?php
-  // include database files
+  // include database files and instantiate them
   require_once 'config/db_config.php';
   require_once 'config/db_conn.php';
-  require_once 'models/Users.php';
-  require_once 'models/Products.php';
-  // Instantiate Customer and Prepare insert query
-  $user = new Users();
+  require_once 'models/User.php';
+  require_once 'models/Product.php';
+  require_once 'models/Comment.php';
+  @$user = new Users();
   $products = new Products();
-
+  $comments = new Comments();
   $uData = [
     'email' => $_SESSION['email']
   ];
+    $res = $user->countUser($uData);
   $PID = $_GET['PID'];
 
   $pData = [
     'PID' => $_GET['PID']
   ];
 
-  $res = $user->countUser($uData);
-  $prod = $products->getProducts();
   $data = $products->getProduct($pData);
+  $com = $comments->getComments($PID);
+  $like = $products->productLikes($PID);
+  $dislike = $products->productDislikes($PID);
 ?>
 
 <!DOCTYPE html>
@@ -37,13 +39,14 @@
           <div class="row">
             <div class="col-md-7">
               <div class="card">
-                <img src="../img/products/<?php echo $data->prod_image; ?>" alt="<?php echo $data->prod_name; ?>" style="width:300px;height:300px">
+                <img src="../assets/img/products/<?php echo $data->prod_image; ?>" alt="<?php echo $data->prod_name; ?>" style="width:300px;height:300px; text-align:center; margin:0 auto;">
                 <h2><?php echo $data->prod_name; ?></h2>
                 <p class="price">NGN<?php echo sprintf('%.2f', $data->prod_price); ?></p>
                 <p><?php echo $data->prod_desc; ?></p>
                 <div>
-                    <span class="lft"><strong><a class="btn btn-info" href="admin-updateProduct?PID="> EDIT </a></strong></span>
-                    <span class="rgt"><strong><button class="btn btn-danger" onclick="myFunction(this.id)" id='+resp[i].id+'> DELETE </button></strong></span>
+                    <span class="lft"><strong><a class="btn btn-info" href="admin-updateProduct?PID=<?php echo $data->PID; ?>"> EDIT </a></strong></span>
+                    <span class="rgt"><strong><a class="btn btn-danger" onclick="javascript: myFunction(this.id)" id="<?php echo $data->PID; ?>"> DELETE </a></strong></span>
+                    <br><br><div class="sharethis-inline-share-buttons"></div>
                 </div>
               </div>
             </div>
@@ -78,35 +81,62 @@
                 <div class="side right"><div>20</div></div>
               </div>
               <div style="margin: 50px auto">
-                <div style="width:40%;float:left">
-                  <h4>name</h4>
-                  <p>created</p>
-                </div>
-                <div style="width:60%;float:right">
-                  <span class="fa fa-star checked"></span>
-                  <span class="fa fa-star checked"></span>
-                  <span class="fa fa-star checked"></span>
-                  <span class="fa fa-star checked"></span>
-                  <span class="fa fa-star"></span>
-                  <p>review</p>
-                </div>
+                <div style="width: 100%; background:green; color:#fff;padding:5px">Likes: &nbsp; <?php echo $like->likes; ?></div>
+                <div style="width: 100%; background:red; color:#fff;padding:5px">Dislikes: &nbsp; <?php echo $dislike->dislikes; ?></div>
               </div>
+              
             </div>
           </div>
         </div>
       </article>
+      <section class="comment-section">
+        <h3 style="text-align:center;">Comment</h3>
+        <hr style="color:#45643f" />
+        <?php foreach($com as $comment): ?>
+          <div class="comment user-comment">
+            <div class="info">
+                <a><?php echo $comment->name; ?></a>
+                <span><?php echo $comment->created_at; ?></span>
+            </div>
+            <a class="avat" href="">
+                <img src="../assets/img/users/<?php echo $comment->photo; ?>" width="45" height="45" alt="Profile Avatar" title="<?php echo $comment->name; ?>" />
+            </a>
+            <p><?php echo $comment->comment; ?></p>
+          </div>
+        <?php endforeach; ?>
+        <div class="write-new">
+          <form action="product" method="POST">
+            <input type="hidden" name="PID" id="" value="<?php echo $data->PID; ?>">
+            <textarea placeholder="Write your comment here" name="comment"></textarea>
+            <div>
+              <img src="../assets/img/users/<?php echo $res->photo; ?>" width="45" height="45" alt="Profile of Bradley Jones" title="<?php echo $res->name; ?>" />
+              <button type="submit">Submit</button>
+            </div>
+          </form>
+        </div>
+        <br />
+      </section>
+    </main>
+    <?php require_once 'inc/footer.php'; ?>
+    <script>
+      $(document).ready(function(){
+        $(".comment:nth-child(odd)").addClass("user-comment");
+        $(".comment:nth-child(even)").addClass("author-comment");
+      });
+    </script>
     </main>
     <?php require_once 'inc/footer.php'; ?>
     <script>
         // DELETE REQUEST FOR POST
-        function myFunction(id) {
-        if (confirm("Are You Sure You Want To Delete Me?")) {
-          
-            
+      function myFunction(id) {
+        var ask = window.confirm("Are you sure you want to delete this post?");
+        if (ask) {
+          window.alert("This post was successfully deleted.");
+          window.location.href = 'admin-deleteProduct?PID=<?php echo $data->PID; ?>';
         } else {
           alert("You Cancelled!");
         }
-    }
+      }
     </script>
   </body>
 </html>

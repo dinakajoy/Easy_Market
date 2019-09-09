@@ -1,17 +1,11 @@
-// SOCIAL SHARING Script
-$(document).ready(function() {
-  var state = false; 
-  $('.fa-share-alt').click(function() {
-    if(!state) {
-      var id = $(this).attr('id');
-      $('#hide'+id).show();
-      state = true;
-    } else {
-      var id = $(this).attr('id');
-      $('#hide'+id).hide();
-      state = false;
-    } 
-    });
+window.addEventListener('load', function() {
+  var status = document.querySelector(".avatar-online i");
+  function updateOnlineStatus(event) {
+    var condition = navigator.onLine ? "online" : "offline";
+    status.className = condition;
+  }
+  window.addEventListener('online',  updateOnlineStatus);
+  window.addEventListener('offline', updateOnlineStatus);
 });
 
 // PPRODUCT PAGE SLIDER Script 
@@ -23,11 +17,8 @@ const auto = true;
 let slideInterval;
 
 const nextSlide = () => {
-  //Get .current
   const current = document.querySelector('.current');
-  //Remove .current
   current.classList.remove('current');
-  //Check for next slide
   if (current.nextElementSibling) {
     //Add .current to next slide element
     current.nextElementSibling.classList.add('current');
@@ -38,11 +29,8 @@ const nextSlide = () => {
   setTimeout(() => current.classList.remove('current'));
 }
 const prevSlide = () => {
-  //Get .current
   const current = document.querySelector('.current');
-  //Remove .current
   current.classList.remove('current');
-  //Check for previous slide
   if (current.previousElementSibling) {
     //Add .current to previous slide element
     current.previousElementSibling.classList.add('current');
@@ -73,3 +61,8 @@ if(auto) {
   slideInterval = setInterval (nextSlide, intervalTime);
 }
 
+
+
+
+
+  

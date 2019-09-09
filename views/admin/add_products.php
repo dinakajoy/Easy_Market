@@ -3,10 +3,10 @@
   // include database files
   require_once 'config/db_config.php';
   require_once 'config/db_conn.php';
-  require_once 'models/Users.php';
-  require_once 'models/Products.php';
+  require_once 'models/User.php';
+  require_once 'models/Product.php';
   // Instantiate Customer and Prepare insert query
-  $user = new Users();
+  @$user = new Users();
 
   $uData = [
     'email' => $_SESSION['email']
@@ -28,9 +28,9 @@
       $temp = $_FILES["prod_image"]["tmp_name"];
       $size = $_FILES["prod_image"]["size"];
       $type = $_FILES["prod_image"]["type"]; //file name "txt_file" 
-      $path = "../../img/products/"; //set upload folder
+      $path = "../../assets/img/products/"; //set upload folder
       $imgExt = strtolower(pathinfo($photo, PATHINFO_EXTENSION));
-      $pt = "../../img/products/" .$photo;
+      $pt = "../../assets/img/products/" .$photo;
 
     // Validate product name
     if(empty($prod_name)){
@@ -54,7 +54,7 @@
     } else if($size > 5000000) {  //check file size 5MB
       $image_err = 'Your File Is To large Please Upload 5MB Size';
     } else {
-      move_uploaded_file($temp, 'img/products/'.$photo);
+      move_uploaded_file($temp, 'assets/img/products/'.$photo);
       $pic = $photo;
     }
 
@@ -73,7 +73,6 @@
       if($product->addProduct($productData)) {
         // Redirect to login
         $feedback = 'Your Product Was Added Successfully';
-        header ();
       } else {
         $feedback = 'Your Product Was Not Added Successfully';
       }

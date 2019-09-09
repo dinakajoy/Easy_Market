@@ -1,10 +1,9 @@
 <?php
-  // include database files
+  // include database files and Instantiate User
   require_once 'config/db_config.php';
   require_once 'config/db_conn.php';
-  require_once 'models/Users.php';
-  // Instantiate Customer and Prepare insert query
-  $user = new Users();
+  require_once 'models/User.php';
+  @$user = new Users();
 
   // Initialize variables
   $success = $email = $name = $phone = $address = $photo = $password = $confirm_password = '';
@@ -17,13 +16,15 @@
     $name = stripslashes(trim($_POST['name']));
     $phone = stripslashes(trim($_POST['phone']));
     $address = stripslashes(trim($_POST['address']));
+
     $photo = $_FILES["photo"]["name"];
       $temp = $_FILES["photo"]["tmp_name"];
       $size = $_FILES["photo"]["size"];
       $type = $_FILES["photo"]["type"]; //file name "txt_file" 
-      $path = "../img/users/"; //set upload folder
+      $path = "../assets/img/users/"; //set upload folder
       $imgExt = strtolower(pathinfo($photo, PATHINFO_EXTENSION));
-      $pt = "../img/users/" .$photo;
+      $pt = "../assets/img/users/" .$photo;
+
     $password = stripslashes(trim($_POST['password']));
     $confirm_password = stripslashes(trim($_POST['confirm_password']));
     // Validate email
@@ -51,14 +52,17 @@
     if(empty($photo)) {
       $photo_err = 'Please Upload Your Photo';
     } else if(!($type=="image/jpg" || $type=='image/jpeg' || $type=='image/png' || $type=='image/gif')) { 
-      $photo_err = 'Upload JPG , JPEG , PNG & GIF File Formate.....CHECK FILE EXTENSION';
-    } else if(file_exists('../img/users/'.$photo)) {
-      $photo_err = 'File Already Exists...Check Upload Folder <br>'; //error message file not exists your upload folder path
+      $photo_err = 'Upload JPG , JPEG , PNG & GIF File Formate... CHECK FILE EXTENSION';
+    } else if(file_exists('../assets/img/users/'.$photo)) {
+      $photo_err = 'File Already Exists... Check Upload Folder <br>'; //error message file not exists your upload folder path
     } else if($size > 5000000) {  //check file size 5MB
       $photo_err = 'Your File Is To large Please Upload 5MB Size';
     } else {
-      move_uploaded_file($temp, 'img/users/'.$photo);
-      $pic = $photo;
+      if(move_uploaded_file($temp, "assets/img/users/".$photo)) {
+         $pic = $photo;
+      } else {
+        $photo_err = 'Could Not Move File... Check Upload Folder <br>';
+      }
     }
     // Validate password
     if(empty($password)){
@@ -92,9 +96,8 @@
       
       // Attempt to execute
       if($user->addUser($userData)) {
-        // Redirect to login
         $success = 'Your Registration was successful ' .$name. '.<br> <br> Please Login.';
-        header("refresh:5;home"); //refresh 3 second and redirect to index.php page
+        header("refresh:3;home"); //refresh 3 second and redirect to index.php page
       } else {
         $success = 'Your Registration Was Not Successful.';
         header("refresh:3;signup.php"); //refresh page after 3 seconds
@@ -130,7 +133,7 @@
         </div>
         <div class="group">
           <label for="phone" class="label">Phone</label>
-          <input id="phone" name="phone" type="tel" class="input <?php echo (!empty($phone_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $phone; ?>">
+          <input id="phone" name="phone" type="text" class="input <?php echo (!empty($phone_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $phone; ?>">
           <span class="invalid-feedback"><?php echo $phone_err; ?></span>
         </div>
         <div class="group">

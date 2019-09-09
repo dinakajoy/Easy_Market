@@ -3,18 +3,16 @@
   // include database files
   require_once 'config/db_config.php';
   require_once 'config/db_conn.php';
-  require_once 'models/Users.php';
-  require_once 'models/Products.php';
+  require_once 'models/User.php';
+  require_once 'models/Product.php';
   // Instantiate Customer and Prepare insert query
-  $user = new Users();
+  @$cust = new Users();
   $products = new Products();
-
   $uData = [
     'email' => $_SESSION['email']
   ];
-
-  $res = $user->countUser($uData);
-  $prod = $products->getProducts();
+  $res = $cust->countUser($uData);
+  $prod = $products->getTwentyProducts();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -25,29 +23,29 @@
     <title>Home | Easy Traders' App</title>
     <?php require_once 'inc/header.php'; ?>
     <main role="main">
-      <section class="jumbotron text-center move-down">
-        <div class="container">
+      <section>
+        <div class="jumbotron">
           <h1 class="jumbotron-heading">Easy Traders' App</h1>
           <p class="lead">A platform for easy management of customers. <br />Chat up any buyer to get their amazing products at your doorstep</p>
-          <a href="admin-dashboard" target="_BLANK" class="btn btn-primary my-2">Be A Seller</a>
+          <a href="checkSeller" target="_BLANK" class="btn btn-primary my-2">Be A Seller</a>
           <a href="products" class="btn btn-info my-2">Search Products</a>
         </div>
       </section>
-      <!-- PRODUCT START -->
-      <article>
+      <!-- Item slider-->
+      <article class="container">
         <div class="scrollmenu">
           <?php foreach($prod as $product): ?>
             <a href="product?PID=<?php echo $product->PID; ?> ">
-              <img src="../img/products/<?php echo $product->prod_image; ?>" width="200px" height="200px" />
+              <img src="../assets/img/products/<?php echo $product->prod_image; ?>" width="200px" height="200px" />
               <h5> <?php echo $product->prod_name; ?></h5>
             </a>
           <?php endforeach; ?>
         </div>
       </article>
-      <!-- PRODUCT END -->
-    </main>
-    <div class="footer container">
-    <h4 style="text-align:center">Easy Traders' App: Online Shopping Blog in Nigeria - No. 1 Shopping Destination</h4>
+      <!-- Item slider end-->
+      
+    <div class="container note">
+      <h4>Easy Traders' App: Online Shopping Blog in Nigeria - No. 1 Shopping Destination</h4>
       <p>
         Easy Traders' App is your number one online shopping site in Nigeria. We are an online Platform where you 
         can purchase all your electronics, as well as books, home appliances, kiddies items, fashion items for men, 
@@ -72,6 +70,7 @@
         and LG.
       </p>
     </div>
+  </main>
     <?php require_once 'inc/footer.php'; ?>
   </body>
 </html>
